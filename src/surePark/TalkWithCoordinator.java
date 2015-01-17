@@ -7,6 +7,7 @@ import gnu.io.SerialPort;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 
 public class TalkWithCoordinator
 {
@@ -109,11 +110,19 @@ public static class SerialWriter implements Runnable
     public void run ()
     {
         try
-        {                
+        {   
+        	/*
+        	String APIMODE= "ATAP";
+        	byte[] apiMode = APIMODE.getBytes(Charset.forName("UTF-8"));
+            System.out.println("writing to Coordinator - ATAP: "+apiMode);
+
+        	this.out.write(apiMode);
+            this.out.flush();
+        	*/
             byte[] array = {0x7E, 0x0D, 0x17 , 0x02, 0x40 , 0x30 , 0x00 , 0x00 , 0x00 , 0x00, 0x00 ,0x00 , 0x00 , 0x00 , 0x00, 0x00, 0x72 };
-            System.out.println("writing to Coordinator - reboot: "+array);
+            //System.out.println("writing to Coordinator - reboot: "+array);
             
-            {  Thread.sleep(30000);
+            {  Thread.sleep(2000);
             System.out.println("awake now: "+array);
 
                this.out.write(array);
@@ -134,7 +143,7 @@ public static void main ( String[] args )
 {
     try
     {
-        (new TalkWithCoordinator()).connect("/dev/tty.usbserial-A702YQGG");
+        (new TalkWithCoordinator()).connect("/dev/tty.usbserial-A6XXH3D2");
     }
     catch ( Exception e )
     {

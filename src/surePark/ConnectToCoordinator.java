@@ -14,13 +14,13 @@ public class ConnectToCoordinator {
 private static final Logger LOG = Logger.getLogger(sureParkServlet.class);
 private final int TIME_OUT=6000;
 private final int BAUD_RATE=115200;
-public static InputStream INPUT_STREAM;
-public static OutputStream OUTPUT_STREAM;
 
 
-public void connect(String portName) throws Exception{
+
+public SerialPort connect(String portName) throws Exception{
 	
     CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(portName);
+    SerialPort serialPort = null;
     if ( portIdentifier.isCurrentlyOwned() )
     {
         System.out.println("Error: Port is currently in use");
@@ -38,7 +38,7 @@ public void connect(String portName) throws Exception{
         	System.out.println("Connection Established.\nSetting serial port parameters");
             if (LOG.isInfoEnabled()) LOG.info("Connection Established.\nSetting serial port parameters");
             
-            SerialPort serialPort = (SerialPort) commPort;
+            serialPort = (SerialPort) commPort;
             serialPort.setSerialPortParams(BAUD_RATE,SerialPort.DATABITS_8,SerialPort.STOPBITS_1,SerialPort.PARITY_NONE);
             serialPort.setFlowControlMode(SerialPort.FLOWCONTROL_NONE);
             
@@ -60,14 +60,15 @@ public void connect(String portName) throws Exception{
             LOG.info("-------------------------------------");
             }
             
-            INPUT_STREAM = serialPort.getInputStream();
-            OUTPUT_STREAM = serialPort.getOutputStream();
+
         }
         else
         {
             System.out.println("Error: Only serial ports are handled by this example.");
+            LOG.error("Error: Only serial ports are handled by this example.");
         }
-    }     
+    }   
+    return serialPort;
 
 }
 }

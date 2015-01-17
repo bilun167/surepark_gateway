@@ -13,5 +13,6 @@
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="/Users/ashutoshprasar/Documents/lib"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="/Users/ashutoshprasar/Downloads/rxtx-2.1.7.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

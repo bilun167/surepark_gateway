@@ -1,11 +1,20 @@
 package surePark;
 
+import gnu.io.NoSuchPortException;
+import gnu.io.SerialPort;
+
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.apache.log4j.Logger;
+
+import surePark.TalkWithCoordinator.SerialReader;
 
 public class sureParkServlet extends HttpServlet {
 
@@ -13,15 +22,53 @@ public class sureParkServlet extends HttpServlet {
 
 	private static final long serialVersionUID = -7404786595814093489L;
 
+	private static final String TOMCAT_PROP_FILE = "tomcat.properties";
+
+	private static final String CONFIG_PROP_FILE = "config.properties";
+
+	public static InputStream INPUT_STREAM;
+
+	public static OutputStream OUTPUT_STREAM;
+
 	public void init() {
 		try {
 			super.init();
-			/*
-			 * Start all Threads here
-			 */
-		}
 
-		catch (Exception e) {
+			// 1. Increment the value of tomcat-start up counter
+			String newLine = System.getProperty("line.separator");
+			int counter = Integer.parseInt(PropertyUtils.getProperty("count",TOMCAT_PROP_FILE));
+	
+			// Logging
+			System.out.println("Tomcat prev start up count = " + counter + newLine + "Incrementing the value by 1");
+			if (LOG.isInfoEnabled())LOG.info("Tomcat prev start up count = " + counter + newLine + "Incrementing the value by 1");
+			
+			PropertyUtils.setProperty("count", Integer.toString(counter + 1),"tomcat.properties");
+
+			// 2. Connect to the Device
+			String portId = PropertyUtils.getProperty("port", CONFIG_PROP_FILE);
+			
+			//Logging
+			System.out.println("Attempting to connect to device: " + portId);
+			if (LOG.isInfoEnabled()) LOG.info("Attempting to connect to device: " + portId);
+
+			SerialPort serialPort = new ConnectToCoordinator().connect(portId);
+			if (serialPort != null) {
+				INPUT_STREAM = serialPort.getInputStream();
+				OUTPUT_STREAM = serialPort.getOutputStream();
+			} else {
+				throw new Exception("Serial port is null!");
+			}
+			
+			// 3. Start Listening
+			new Thread(new DataListener(INPUT_STREAM)).start();
+			Thread.currentThread().sleep(3000);
+			new SendCommand(OUTPUT_STREAM, (byte)0x00).sendRebootAllCommand();
+			
+		} catch (NoSuchPortException e) {
+			System.out.println("Coordinator is not connected or port number is wrong in config.properties. "+ e);
+			LOG.error("Coordinator is not connected or port number is wrong in config.properties. "+ e);
+		} catch (Exception e) {
+			System.out.println(e);
 			LOG.fatal(e.getMessage());
 		}
 	}
@@ -79,6 +126,13 @@ public class sureParkServlet extends HttpServlet {
 			response.getWriter().print(responseXml);
 		}
 
+	}
+
+	public static void main(String args[]) {
+		new sureParkServlet().init();
+		// System.out.println(PropertyUtils.getProperty("count",TOMCAT_PROP_FILE));
+		// System.out.println(PropertyUtils.getProperty("port",CONFIG_PROP_FILE));
+		// PropertyUtils.setProperty("count", "5","tomcat.properties");
 	}
 
 }
