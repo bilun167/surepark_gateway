@@ -62,8 +62,15 @@ public class sureParkServlet extends HttpServlet {
 			// 3. Start Listening
 			new Thread(new DataListener(INPUT_STREAM)).start();
 			Thread.currentThread().sleep(3000);
-			new SendCommand(OUTPUT_STREAM, (byte)0x00).sendRebootAllCommand();
+			new SendCommand(OUTPUT_STREAM, (byte)0x01).goToAPIMode();
+						
+			//Thread.currentThread().sleep(3000);
+			//new SendCommand(OUTPUT_STREAM, (byte)0x01).SendTopologyCommand();
 			
+			Thread.currentThread().sleep(3000);
+			new SendCommand(OUTPUT_STREAM, (byte)0x02).sendRebootAllCommand();
+			
+
 		} catch (NoSuchPortException e) {
 			System.out.println("Coordinator is not connected or port number is wrong in config.properties. "+ e);
 			LOG.error("Coordinator is not connected or port number is wrong in config.properties. "+ e);
@@ -133,6 +140,19 @@ public class sureParkServlet extends HttpServlet {
 		// System.out.println(PropertyUtils.getProperty("count",TOMCAT_PROP_FILE));
 		// System.out.println(PropertyUtils.getProperty("port",CONFIG_PROP_FILE));
 		// PropertyUtils.setProperty("count", "5","tomcat.properties");
+		/*
+		byte[] processor = new byte[28];
+	     byte arr1[] = { 0, 1, 2, 3, 4, 5 };
+	      byte arr2[] = { 6, 7, 8, 8, 10, 11 };
+	    
+	      // copies an array from the specified source array
+	      System.arraycopy(arr1, 0, processor, 0, arr1.length);
+	      System.arraycopy(arr2, 0, processor, arr1.length, arr2.length);
+
+	      System.out.println(processor.length);
+	      for(int i=0;i<processor.length ;i++)
+	      System.out.print(processor[i] + " ");
+*/
 	}
 
 }

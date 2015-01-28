@@ -39,7 +39,7 @@ public class CoordinatorUtils {
 		}	
 	
 	public static byte[] constructTOPOCommand(byte frameId){
-		byte CRC=(byte) (frameId+0x96);
+		byte CRC=(byte) (frameId+0x94);
 		byte[] topoArr = {START_DLM,0x0d,REMT_REQ,frameId,BROAD_CAST,TOPOLOGY,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,CRC};
 		return topoArr;		
 	}
