@@ -12,6 +12,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.binary.Hex;
 import org.apache.log4j.Logger;
 
 import surePark.TalkWithCoordinator.SerialReader;
@@ -62,7 +64,7 @@ public class sureParkServlet extends HttpServlet {
 			// 3. Start Listening
 			new Thread(new DataListener(INPUT_STREAM)).start();
 			Thread.currentThread().sleep(3000);
-			new SendCommand(OUTPUT_STREAM, (byte)0x01).goToAPIMode();
+			new SendCommand(OUTPUT_STREAM).goToAPIMode();
 						
 			//Thread.currentThread().sleep(3000);
 			//new SendCommand(OUTPUT_STREAM, (byte)0x01).SendTopologyCommand();
@@ -136,23 +138,16 @@ public class sureParkServlet extends HttpServlet {
 	}
 
 	public static void main(String args[]) {
-		new sureParkServlet().init();
-		// System.out.println(PropertyUtils.getProperty("count",TOMCAT_PROP_FILE));
-		// System.out.println(PropertyUtils.getProperty("port",CONFIG_PROP_FILE));
-		// PropertyUtils.setProperty("count", "5","tomcat.properties");
-		/*
-		byte[] processor = new byte[28];
-	     byte arr1[] = { 0, 1, 2, 3, 4, 5 };
-	      byte arr2[] = { 6, 7, 8, 8, 10, 11 };
-	    
-	      // copies an array from the specified source array
-	      System.arraycopy(arr1, 0, processor, 0, arr1.length);
-	      System.arraycopy(arr2, 0, processor, arr1.length, arr2.length);
-
-	      System.out.println(processor.length);
-	      for(int i=0;i<processor.length ;i++)
-	      System.out.print(processor[i] + " ");
-*/
+		//new sureParkServlet().init();
+		String s="ab10";
+		try {
+			byte arr[]=Hex.decodeHex(s.toCharArray());
+			System.out.println(arr[0]);
+			System.out.println(arr[1]);
+		} catch (DecoderException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

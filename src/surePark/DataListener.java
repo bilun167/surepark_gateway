@@ -240,7 +240,20 @@ public class DataListener implements Runnable {
 	}
 
 	public void ProcessCarData(byte[] topoArray) {
-      
+		int statusId = topoArray[3];
+		String statusStr = statusResult[statusId];
+		if (statusId != 0) {
+			System.out.println("Command failed with error : " + statusStr);
+			LOG.error("Command failed with error : " + statusStr);
+		}
+		else{
+		// Extract info from Car data	
+		String macStr = buildMac(topoArray, 8, 8);
+		String radio_channel = String.format("%02x", topoArray[4]);
+		int occupancy = topoArray[5];
+		String dataTosend = "Pkdt,"+macStr +","+occupancy;
+		// Send to kinesis		
+		AWSUtil.getInstance().sendToKinesis(dataTosend);				
+		}
 	}
-
 }

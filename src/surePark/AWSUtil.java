@@ -1,6 +1,5 @@
 package surePark;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import com.amazonaws.services.kinesis.AmazonKinesisClient;
@@ -9,64 +8,56 @@ import com.amazonaws.services.kinesis.model.PutRecordResult;
 
 public class AWSUtil {
 
-    public static void main(String[] args) throws IOException {
-        
-        // Creating a kinesis stream
-        // =========================
-        // This is a sample stream.
-        // We will use this program to be the producer for now.
-        // will move to sample 2 for the consumer
-        AmazonKinesisClient kinesisClient = new AmazonKinesisClient();
-        kinesisClient.setEndpoint("kinesis.ap-southeast-1.amazonaws.com"
-                                 ,"kinesis"
-                                 ,"ap-southeast-1");
-        
-        // Checking if object is created fine
-        if(kinesisClient!=null) System.out.println("\n\nGot kinesis\n\n");
-        
-        /*
-         *
-        // Creating the streamRequest
-        CreateStreamRequest createStreamRequest = new CreateStreamRequest();
-        createStreamRequest.setStreamName("exhaust1");
-        createStreamRequest.setShardCount(1);
-        
-        // Creating the stream
-        kinesisClient.createStream(createStreamRequest);
-        *
-        */
+	private static AWSUtil AWSUTIL;
+	private static final String CONFIG_PROP_FILE = "config.properties";
 
-        // Putting data into the stream! exciting!!
-        // ========================================
-        String sequenceNumberOfPreviousRecord = "20";
-        int j = 0;
-        while(true) 
-        {
-        	try {
-				Thread.currentThread().sleep(1000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-            j++;
-            PutRecordRequest putRecordRequest = new PutRecordRequest();
-            putRecordRequest.setStreamName("exhaust1");
-            String data = String.format("[Ashu]parking lot - %d",j);
-            putRecordRequest.setData(ByteBuffer
-                .wrap(data.getBytes()));
-            putRecordRequest
-                .setPartitionKey(String.format("partitionKey-%d",j));
-            putRecordRequest
-                .setSequenceNumberForOrdering(sequenceNumberOfPreviousRecord);
-            PutRecordResult putRecordResult 
-                = kinesisClient.putRecord(putRecordRequest);
-            System.out.println(putRecordResult.toString());
-            System.out.print(", data: ");
-            System.out.print(data);
-            sequenceNumberOfPreviousRecord 
-                = putRecordResult.getSequenceNumber();
-        }
-    } 
+	private AmazonKinesisClient kinesisClient;
+	private String endPoint;
+	private String serviceName;
+	private String regionId;
+	private String seed;
+	private String stream;
+	private String partition;
 
+	private AWSUtil() {
+		endPoint = PropertyUtils.getProperty("aws_end_point", CONFIG_PROP_FILE);
+		serviceName = PropertyUtils.getProperty("aws_service_name", CONFIG_PROP_FILE);
+		regionId = PropertyUtils.getProperty("aws_region_id", CONFIG_PROP_FILE);
+		seed = PropertyUtils.getProperty("aws_seed", CONFIG_PROP_FILE);
+		stream = PropertyUtils.getProperty("aws_stream_name", CONFIG_PROP_FILE);
+		partition = PropertyUtils.getProperty("aws_partition", CONFIG_PROP_FILE);
+		kinesisClient = new AmazonKinesisClient();
+		kinesisClient.setEndpoint(endPoint, serviceName, regionId);
+	}
+
+	public static AWSUtil getInstance() {
+		if (AWSUTIL == null) {
+			AWSUTIL = new AWSUtil();
+			return AWSUTIL;
+		} else
+			return AWSUTIL;
+	}
+
+	public synchronized void sendToKinesis(String data) {
+
+		// Checking if object is created fine
+		if (kinesisClient != null)
+			System.out.println("\n\nGot kinesis\n\n");
+
+		// Putting data into the stream!
+		// ========================================
+		String sequenceNumberOfPreviousRecord = seed;
+		
+		PutRecordRequest putRecordRequest = new PutRecordRequest();
+		putRecordRequest.setStreamName(stream);
+		putRecordRequest.setData(ByteBuffer.wrap(data.getBytes()));
+		putRecordRequest.setPartitionKey(partition);
+		putRecordRequest.setSequenceNumberForOrdering(sequenceNumberOfPreviousRecord);
+		PutRecordResult putRecordResult = kinesisClient.putRecord(putRecordRequest);
+		System.out.println(putRecordResult.toString());
+		System.out.print("data: ");
+		System.out.print(data);
+		sequenceNumberOfPreviousRecord = putRecordResult.getSequenceNumber();
+	}
 
 }
