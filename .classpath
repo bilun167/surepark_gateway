@@ -25,5 +25,6 @@
 	<classpathentry kind="lib" path="/Users/ashutoshprasar/Documents/lib/jackson-databind-2.3.2.jar"/>
 	<classpathentry kind="lib" path="/Users/ashutoshprasar/Documents/lib/joda-time-2.7.jar"/>
 	<classpathentry kind="lib" path="/Users/ashutoshprasar/Documents/lib/jackson-core-2.3.2.jar"/>
+	<classpathentry kind="lib" path="/Users/ashutoshprasar/Documents/lib/sqlite-jdbc-3.8.7.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

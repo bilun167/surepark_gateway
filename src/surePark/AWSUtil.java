@@ -2,6 +2,8 @@ package surePark;
 
 import java.nio.ByteBuffer;
 
+import org.apache.log4j.Logger;
+
 import com.amazonaws.services.kinesis.AmazonKinesisClient;
 import com.amazonaws.services.kinesis.model.PutRecordRequest;
 import com.amazonaws.services.kinesis.model.PutRecordResult;
@@ -10,6 +12,8 @@ public class AWSUtil {
 
 	private static AWSUtil AWSUTIL;
 	private static final String CONFIG_PROP_FILE = "config.properties";
+	private static final Logger LOG = Logger.getLogger(AWSUtil.class);
+
 
 	private AmazonKinesisClient kinesisClient;
 	private String endPoint;
@@ -42,8 +46,11 @@ public class AWSUtil {
 
 		// Checking if object is created fine
 		if (kinesisClient != null)
-			System.out.println("\n\nGot kinesis\n\n");
-
+		{
+			// LOGGING
+			// System.out.println("Sending data to Kinesis");
+		    if(LOG.isInfoEnabled()) LOG.info("Sending data to Kinesis");
+			
 		// Putting data into the stream!
 		// ========================================
 		String sequenceNumberOfPreviousRecord = seed;
@@ -54,10 +61,21 @@ public class AWSUtil {
 		putRecordRequest.setPartitionKey(partition);
 		putRecordRequest.setSequenceNumberForOrdering(sequenceNumberOfPreviousRecord);
 		PutRecordResult putRecordResult = kinesisClient.putRecord(putRecordRequest);
-		System.out.println(putRecordResult.toString());
-		System.out.print("data: ");
-		System.out.print(data);
+		
+		// LOGGING
+		// System.out.println(putRecordResult.toString());
+		// System.out.println("data: "+data);
+	    if(LOG.isInfoEnabled()) LOG.info(putRecordResult.toString());
+	    if(LOG.isInfoEnabled()) LOG.info("data: "+data);
+
 		sequenceNumberOfPreviousRecord = putRecordResult.getSequenceNumber();
+		}
+		else{
+			// LOGGING
+			// System.out.println("ERROR: can't connect to Kinesis");
+			LOG.error("ERROR: can't connect to Kinesis");		
+			}		
 	}
+	
 
 }
