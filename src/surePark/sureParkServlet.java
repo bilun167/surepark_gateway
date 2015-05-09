@@ -132,6 +132,14 @@ public class sureParkServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
 		response.getWriter().println("<h1>Sure Park is active!</h1>");
+		String paramName = "do";
+		String paramValue = request.getParameter(paramName);
+        if(paramValue.equalsIgnoreCase("rebootall")){
+			new SendCommand(OUTPUT_STREAM, (byte)0x00).sendRebootAllCommand();
+        }
+        if(paramValue.equalsIgnoreCase("topoall")){
+        	new SendCommand(OUTPUT_STREAM, (byte) 0x00).SendTopologyCommand();
+        }       
 	}
 
 	protected void doPost(HttpServletRequest request,
