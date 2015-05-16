@@ -2,7 +2,6 @@ package surePark;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.SQLException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -63,6 +62,12 @@ public class DataListener implements Runnable {
 			if (LOG.isInfoEnabled()) LOG.info("Started listening");
 			while ((len = this.in.read(buffer)) > -1) {
 				try{
+					
+				String str = new String(buffer, 0, len);
+				if (str.length()==0 && str.equals("")) {
+					//if (LOG.isInfoEnabled()) LOG.info("Waiting for signal ... ");
+					continue;
+				}
 					i++;	
 				if (LOG.isInfoEnabled()) LOG.info("Got a signal: [#"+ i + "] "+buffer);	
 				if (buffer[0] == 126) {
@@ -71,8 +76,7 @@ public class DataListener implements Runnable {
 					seven_e = true;
 				} else {
 					if (seven_e == true) {
-						String str = new String(buffer, 0, len);
-						
+						//String str = new String(buffer, 0, len);
 						// LOGGING
 						// System.out.println(newLine + "Received a signal: [#"+ i + "] of length -" + str.length());
 						// System.out.println("Message :"+ toHexString(buffer, str.length()));
@@ -119,7 +123,7 @@ public class DataListener implements Runnable {
 						}
 
 					} else {
-						String str = new String(buffer, 0, len);
+						//String str = new String(buffer, 0, len);
 						// LOGGING
 						// System.out.println(newLine + "Received a signal: [#"+ i + "] of length -" + str.length());
 						// System.out.println("Message :" + str);

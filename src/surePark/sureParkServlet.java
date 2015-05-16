@@ -12,11 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.codec.DecoderException;
-import org.apache.commons.codec.binary.Hex;
 import org.apache.log4j.Logger;
-
-import surePark.TalkWithCoordinator.SerialReader;
 
 public class sureParkServlet extends HttpServlet {
 
@@ -76,7 +72,7 @@ public class sureParkServlet extends HttpServlet {
 			
 			// 4. sleep for 3 seconds and then send Topology coordinator command
 			Thread.currentThread().sleep(3000);
-			String res= new SendCommand(OUTPUT_STREAM, (byte) 0x00).SendTopologyCoordinatorCommand();
+			String res= new SendCommand(OUTPUT_STREAM, (byte) 0x01).SendTopologyCoordinatorCommand();
 			if(res.compareTo("SUCCEESS")==0){
 				// Logging	
 				// System.out.println("Got coordinator MAC successfully");
@@ -96,6 +92,9 @@ public class sureParkServlet extends HttpServlet {
 				// System.out.println("Kinesis client started successfully");
 				if (LOG.isInfoEnabled()) LOG.info("Kinesis client started successfully");
 			}
+			
+			// 7. Server IP and send it to Kinesis and schedule this task for every 24 hours.
+			ServerConnectionScheduler.getInstance(awsutil).reconnectionScheduler(24*60*60);
 			
 			// Logging	
 			// System.out.println("Sure Park servlet started successfully, ready to roll!!");
