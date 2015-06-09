@@ -55,11 +55,17 @@ public class AWSUtil {
 		// ========================================
 		String sequenceNumberOfPreviousRecord = seed;
 		
+		try{
+			
+		
 		PutRecordRequest putRecordRequest = new PutRecordRequest();
 		putRecordRequest.setStreamName(stream);
 		putRecordRequest.setData(ByteBuffer.wrap(data.getBytes()));
 		putRecordRequest.setPartitionKey(partition);
 		putRecordRequest.setSequenceNumberForOrdering(sequenceNumberOfPreviousRecord);
+		
+		
+		if(LOG.isInfoEnabled()) LOG.info(stream +"--"+partition);
 		PutRecordResult putRecordResult = kinesisClient.putRecord(putRecordRequest);
 		
 		// LOGGING
@@ -69,6 +75,10 @@ public class AWSUtil {
 	    if(LOG.isInfoEnabled()) LOG.info("data: "+data);
 
 		sequenceNumberOfPreviousRecord = putRecordResult.getSequenceNumber();
+		}
+		catch(Exception e){
+			if(LOG.isInfoEnabled()) LOG.info("Error"+e);
+		}
 		}
 		else{
 			// LOGGING
